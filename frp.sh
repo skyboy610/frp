@@ -215,7 +215,7 @@ ask_protocol() {
         3) PROTO="quic";      PROTO_LABEL="quic";   PROTO_MUX="false"; PROTO_TLS="true"  ;;
         4) PROTO="websocket"; PROTO_LABEL="ws";     PROTO_MUX="false"; PROTO_TLS="false" ;;
         5) PROTO="websocket"; PROTO_LABEL="wsmux";  PROTO_MUX="true";  PROTO_TLS="false" ;;
-        6) PROTO="websocket"; PROTO_LABEL="wssmux"; PROTO_MUX="true";  PROTO_TLS="true"  ;;
+        6) PROTO="wss";       PROTO_LABEL="wssmux"; PROTO_MUX="true";  PROTO_TLS="true"  ;;
         *) PROTO="" ;;
     esac
 }
@@ -589,7 +589,16 @@ add_tunnel_kharej() {
         echo "transport.dialServerKeepalive = 7200"
         echo "transport.heartbeatInterval = 30"
         echo "transport.heartbeatTimeout = 90"
-        if [[ "$proto_tls" == "true" ]]; then
+        if [[ "$protocol" == "wss" ]]; then
+            # wss already runs websocket over standard TLS (needed for CDN on 443).
+            # Do NOT also enable frp's own TLS layer, or it double-wraps and breaks CDN.
+            if [[ -n "$tls_cert" ]]; then
+                echo "transport.tls.certFile = \"${tls_cert}\""
+                echo "transport.tls.keyFile = \"${tls_key}\""
+            fi
+            [[ -n "$tls_ca" ]]  && echo "transport.tls.trustedCaFile = \"${tls_ca}\""
+            [[ -n "$tls_sni" ]] && echo "transport.tls.serverName = \"${tls_sni}\""
+        elif [[ "$proto_tls" == "true" ]]; then
             echo "transport.tls.enable = true"
             if [[ -n "$tls_cert" ]]; then
                 echo "transport.tls.certFile = \"${tls_cert}\""
