@@ -58,12 +58,13 @@ clear_screen() { printf "\033c"; }
 
 print_logo() {
     echo ""
-    echo -e "${COLORS[PINK]}   ██████╗  ${COLORS[CYAN]}██████╗  ${COLORS[YELLOW]}██╗     ${COLORS[ORANGE]}██████╗  ${COLORS[BLUE]}███████╗${COLORS[OLIVE]}██████╗ ${COLORS[PURPLE]}██████╗ ${COLORS[RESET]}"
-    echo -e "${COLORS[PINK]}  ██╔════╝  ${COLORS[CYAN]}██╔══██╗ ${COLORS[YELLOW]}██║     ${COLORS[ORANGE]}██╔══██╗ ${COLORS[BLUE]}██╔════╝${COLORS[OLIVE]}██╔══██╗${COLORS[PURPLE]}██╔══██╗${COLORS[RESET]}"
-    echo -e "${COLORS[PINK]}  ██║  ███╗ ${COLORS[CYAN]}██║  ██║ ${COLORS[YELLOW]}██║     ${COLORS[ORANGE]}██║  ██║ ${COLORS[BLUE]}█████╗  ${COLORS[OLIVE]}██████╔╝${COLORS[PURPLE]}██████╔╝${COLORS[RESET]}"
-    echo -e "${COLORS[PINK]}  ██║   ██║ ${COLORS[CYAN]}██║  ██║ ${COLORS[YELLOW]}██║     ${COLORS[ORANGE]}██║  ██║ ${COLORS[BLUE]}██╔══╝  ${COLORS[OLIVE]}██╔══██╗${COLORS[PURPLE]}██╔═══╝ ${COLORS[RESET]}"
-    echo -e "${COLORS[PINK]}  ╚██████╔╝ ${COLORS[CYAN]}██████╔╝ ${COLORS[YELLOW]}███████╗${COLORS[ORANGE]}██████╔╝ ${COLORS[BLUE]}██║     ${COLORS[OLIVE]}██║  ██║${COLORS[PURPLE]}██║     ${COLORS[RESET]}"
-    echo -e "${COLORS[PINK]}   ╚═════╝  ${COLORS[CYAN]}╚═════╝  ${COLORS[YELLOW]}╚══════╝${COLORS[ORANGE]}╚═════╝  ${COLORS[BLUE]}╚═╝     ${COLORS[OLIVE]}╚═╝  ╚═╝${COLORS[PURPLE]}╚═╝     ${COLORS[RESET]}"
+    echo -e "${COLORS[PINK]}  >==>    >=> >=======> >===>>=====> >======>     >=======> >=>      >=>${COLORS[RESET]}"
+    echo -e "${COLORS[CYAN]}  >> >=>  >=> >=>            >=>     >=>    >=>   >=>        >=>   >=>${COLORS[RESET]}"
+    echo -e "${COLORS[YELLOW]}  >=> >=> >=> >=>            >=>     >=>    >=>   >=>         >=> >=>${COLORS[RESET]}"
+    echo -e "${COLORS[ORANGE]}  >=>  >=>>=> >=====>        >=>     >> >==>      >=====>       >=>${COLORS[RESET]}"
+    echo -e "${COLORS[BLUE]}  >=>   > >=> >=>            >=>     >=>  >=>     >=>         >=> >=>${COLORS[RESET]}"
+    echo -e "${COLORS[OLIVE]}  >=>    >>=> >=>            >=>     >=>    >=>   >=>        >=>   >=>${COLORS[RESET]}"
+    echo -e "${COLORS[PURPLE]}  >=>     >=> >=======>      >=>     >=>      >=> >=======> >=>      >=>${COLORS[RESET]}"
     echo ""
     print_color "CYAN"   "        F R P   R E V E R S E   T U N N E L   M A N A G E R"
     print_color "ORANGE" "  ═══════════════════════════════════════════════════════════════"
@@ -1221,7 +1222,8 @@ main_menu() {
         print_color "RED"    "  [8] Exit"
         echo ""
         print_color "CYAN" "Select option:"
-        read -r choice
+        read -r choice || { echo; exit 0; }
+        choice="${choice//[$'\r\n']/}"
 
         case "$choice" in
             1) install_frp ;;
@@ -1236,6 +1238,13 @@ main_menu() {
         esac
     done
 }
+
+# When run via a pipe (e.g. curl ... | bash) stdin is the script text, not the
+# keyboard, which makes every `read` return empty and spam "Invalid option".
+# Reconnect interactive input to the real terminal.
+if [[ ! -t 0 && -e /dev/tty ]]; then
+    exec </dev/tty
+fi
 
 check_root
 main_menu
