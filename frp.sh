@@ -58,13 +58,12 @@ clear_screen() { printf "\033c"; }
 
 print_logo() {
     echo ""
-    echo -e "${COLORS[PINK]}  >==>    >=> >=======> >===>>=====> >======>     >=======> >=>      >=>${COLORS[RESET]}"
-    echo -e "${COLORS[CYAN]}  >> >=>  >=> >=>            >=>     >=>    >=>   >=>        >=>   >=>${COLORS[RESET]}"
-    echo -e "${COLORS[YELLOW]}  >=> >=> >=> >=>            >=>     >=>    >=>   >=>         >=> >=>${COLORS[RESET]}"
-    echo -e "${COLORS[ORANGE]}  >=>  >=>>=> >=====>        >=>     >> >==>      >=====>       >=>${COLORS[RESET]}"
-    echo -e "${COLORS[BLUE]}  >=>   > >=> >=>            >=>     >=>  >=>     >=>         >=> >=>${COLORS[RESET]}"
-    echo -e "${COLORS[OLIVE]}  >=>    >>=> >=>            >=>     >=>    >=>   >=>        >=>   >=>${COLORS[RESET]}"
-    echo -e "${COLORS[PURPLE]}  >=>     >=> >=======>      >=>     >=>      >=> >=======> >=>      >=>${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}███╗   ██╗ ${COLORS[CYAN]}███████╗ ${COLORS[YELLOW]}████████╗ ${COLORS[ORANGE]}██████╗  ${COLORS[BLUE]}███████╗ ${COLORS[PURPLE]}██╗  ██╗${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}████╗  ██║ ${COLORS[CYAN]}██╔════╝ ${COLORS[YELLOW]}╚══██╔══╝ ${COLORS[ORANGE]}██╔══██╗ ${COLORS[BLUE]}██╔════╝ ${COLORS[PURPLE]}╚██╗██╔╝${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}██╔██╗ ██║ ${COLORS[CYAN]}█████╗   ${COLORS[YELLOW]}   ██║    ${COLORS[ORANGE]}██████╔╝ ${COLORS[BLUE]}█████╗   ${COLORS[PURPLE]} ╚███╔╝ ${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}██║╚██╗██║ ${COLORS[CYAN]}██╔══╝   ${COLORS[YELLOW]}   ██║    ${COLORS[ORANGE]}██╔══██╗ ${COLORS[BLUE]}██╔══╝   ${COLORS[PURPLE]} ██╔██╗ ${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}██║ ╚████║ ${COLORS[CYAN]}███████╗ ${COLORS[YELLOW]}   ██║    ${COLORS[ORANGE]}██║  ██║ ${COLORS[BLUE]}███████╗ ${COLORS[PURPLE]}██╔╝ ██╗${COLORS[RESET]}"
+    echo -e "  ${COLORS[PINK]}╚═╝  ╚═══╝ ${COLORS[CYAN]}╚══════╝ ${COLORS[YELLOW]}   ╚═╝    ${COLORS[ORANGE]}╚═╝  ╚═╝ ${COLORS[BLUE]}╚══════╝ ${COLORS[PURPLE]}╚═╝  ╚═╝${COLORS[RESET]}"
     echo ""
     print_color "CYAN"   "        F R P   R E V E R S E   T U N N E L   M A N A G E R"
     print_color "ORANGE" "  ═══════════════════════════════════════════════════════════════"
@@ -199,12 +198,12 @@ ask_protocol() {
     echo ""
     print_color "CYAN" "Select tunnel transport protocol:"
     echo ""
-    print_color "PINK"   "  [1] TCP        (most compatible)"
-    print_color "CYAN"   "  [2] KCP        (UDP based, fast under packet loss)"
-    print_color "YELLOW" "  [3] QUIC       (UDP based, modern, low latency)"
-    print_color "ORANGE" "  [4] WS         (websocket, single connection)"
-    print_color "PURPLE" "  [5] WSMUX      (websocket + multiplex, CDN friendly)"
-    print_color "TEAL"   "  [6] WSSMUX     (websocket + multiplex + TLS, best for CDN)"
+    print_color "PINK"   "  [1] TCP"
+    print_color "CYAN"   "  [2] KCP"
+    print_color "YELLOW" "  [3] QUIC"
+    print_color "ORANGE" "  [4] WS"
+    print_color "PURPLE" "  [5] WSMUX"
+    print_color "TEAL"   "  [6] WSSMUX"
     echo ""
     print_color "PINK" "Select (1-6):"
     read -r _p
@@ -531,7 +530,7 @@ add_tunnel_kharej() {
     [[ -z "$token" ]] && { msg_err "Token is required"; sleep 2; return; }
 
     echo ""
-    print_color "PURPLE" "VPN Config Port(s) to expose, comma separated (e.g. 443,8443):"
+    print_color "PURPLE" "VPN Config Port(s)  (e.g. 8080,80):"
     read -r vpn_ports_input
 
     echo ""
@@ -751,7 +750,7 @@ manage_tunnel_actions() {
         print_color "ORANGE" "  [4] Edit"
         print_color "PURPLE" "  [5] View Config"
         print_color "TEAL"   "  [6] Live Logs"
-        print_color "BLUE"   "  [7] Delete"
+        print_color "RED"    "  [7] Delete"
         print_color "OLIVE"  "  [0] Back"
         echo ""
         print_color "PINK" "Select action:"
@@ -859,7 +858,7 @@ edit_tunnel() {
 edit_kharej_ports() {
     local tunnel="$1" config_file="$2"
     echo ""
-    print_color "YELLOW" "New VPN Config Ports (comma separated):"
+    print_color "YELLOW" "New VPN Config Ports  (e.g. 8080,80):"
     read -r new_ports
     echo ""
     print_color "CYAN" "Port type:  [1] TCP   [2] UDP   [3] Both"
@@ -909,7 +908,7 @@ edit_kharej_ports() {
 delete_tunnel() {
     local tunnel="$1"
     clear_screen; print_logo
-    msg_warn "Delete tunnel '${tunnel}' ? (yes/no)"
+    msg_err "Delete tunnel '${tunnel}' ? (yes/no)"
     read -r confirm
     if [[ "$confirm" == "yes" ]]; then
         systemctl stop "$tunnel" 2>/dev/null
@@ -1057,8 +1056,8 @@ uninstall_frp() {
     print_color "CYAN"   "  Uninstall FRP"
     print_color "ORANGE" "═══════════════════════════════════════════════════"
     echo ""
-    msg_warn "This removes ALL tunnels and the FRP installation"
-    print_color "YELLOW" "Are you sure? (yes/no)"
+    msg_err "This removes ALL tunnels and the FRP installation"
+    echo -e "${BG_RED}  Are you sure? (yes/no)  ${C_RESET}"
     read -r confirm
     [[ "$confirm" != "yes" ]] && { clear_screen; print_logo; msg_warn "Uninstall cancelled"; press_enter; return; }
 
@@ -1227,8 +1226,8 @@ main_menu() {
         print_color "ORANGE" "  [4] Logs"
         print_color "BLUE"   "  [5] Tunnel Status"
         print_color "TEAL"   "  [6] CDN Setup (Nginx for frps)"
-        print_color "PURPLE" "  [7] Uninstall"
-        print_color "RED"    "  [8] Exit"
+        print_color "RED"    "  [7] Uninstall"
+        print_color "OLIVE"  "  [8] Exit"
         echo ""
         print_color "CYAN" "Select option:"
         read -r choice || { echo; exit 0; }
